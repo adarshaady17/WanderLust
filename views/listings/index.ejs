@@ -1,27 +1,195 @@
-<% layout("/layouts/boilerplate.ejs")%>
-<%=success%>
-<body>
-    <h3>All Listings</h3>
-    <!-- <form method="GET" action="/listings/new">
-        <button>Create new Listing</button>
-    </form> -->
+<% layout("/layouts/boilerplate.ejs") %>
 
-    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-        <%for(let listing of allListings){%>
-            <a href="/listings/<%=listing._id%>" class="listing-link">
-            <div class="card col listing-card">
-                <img src="<%=listing.image%>" class="card-img-top" style="height:20rem ;" alt="listing_image">
-                <div class="card-img-overlay"></div>
-                <div class="card-body">
-                  <p class="card-text">
-                    <b><%= listing.title %></b>
-                    <br>
-                    &#8377;<%= listing.price.toLocaleString("en-IN") %>/night
-                </p>
-                </div>
-              </div>
-            </a>
-              <%}%>
-    </div> 
+<style>
+  #filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .filter {
+    text-align: center;
+    margin-right: 2rem;
+    margin-top: 1rem;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+  }
+
+  .filter:hover {
+    opacity: 1;
+    cursor: pointer;
+    color: #fe424d;
+  }
   
-</body>
+  .tax-info {
+    display: none;
+  }
+
+  .tax-switch {
+    border: 1px solid #dee2e6;
+    border-radius: 1rem;
+    height: 3rem;
+    padding: 0.5rem; 
+    align-items: center;
+    display: flex;
+    margin-top: 1rem;
+  }
+
+  .search-results-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .listing-card {
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .listing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .listing-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-img-overlay {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+    color: white;
+    font-weight: bold;
+  }
+</style>
+
+<!-- Search Results Header -->
+<% if(q && q.length > 0) { %>
+  <div class="search-results-header">
+    <h3>Search Results for "<%= q %>"</h3>
+    <p class="text-muted"><%= allListings.length %> <%= allListings.length === 1 ? 'listing' : 'listings' %> found</p>
+  </div>
+<% } %>
+
+<!-- Filters Section -->
+<div id="filters">
+  <div class="filter">
+    <div><i class="fa-solid fa-fire"></i></div>
+    <p>Trending</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-bed"></i></div>
+    <p>Rooms</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-mountain-city"></i></div>
+    <p>Iconic Cities</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-brands fa-fort-awesome"></i></div>
+    <p>Castles</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-mountain-sun"></i></div>
+    <p>Mountain Views</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-tent"></i></div>
+    <p>Camping</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-person-swimming"></i></div>
+    <p>Amazing Nature</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-tractor"></i></div>
+    <p>Farms</p>
+  </div>
+
+  <div class="filter">
+    <div><i class="fa-solid fa-snowflake"></i></div>
+    <p>Arctic</p>
+  </div>
+
+  <div class="tax-switch">
+    <div class="form-check-reverse form-switch">
+      <input 
+          class="form-check-input" 
+          type="checkbox" 
+          role="switch" 
+          id="flexSwitchCheckDefault">
+      <label 
+          class="form-check-label" 
+          for="flexSwitchCheckDefault">Display Taxes
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Listings Grid -->
+<% if(allListings.length > 0) { %>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <% for(let listing of allListings) { %>
+      <div class="col">
+        <a href="/listings/<%= listing._id %>" class="listing-link">
+          <div class="card h-100 listing-card">
+            <img 
+              class="card-img-top" 
+              src="<%= listing.image.url %>" 
+              alt="<%= listing.title %>" 
+              style="height: 20rem; object-fit: cover;">
+            
+            <div class="card-img-overlay">
+              <i><b>WanderLust</b></i>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title"><%= listing.title %></h5>
+              <p class="card-text">
+                <span class="fw-bold">₹<%= listing.price %></span> / night
+                <span class="tax-info text-muted">+18% GST</span>
+              </p>
+              <% if(listing.description && listing.description.length > 0) { %>
+                <p class="card-text text-truncate"><%= listing.description %></p>
+              <% } %>
+            </div>
+          </div>
+        </a>
+      </div>
+    <% } %>
+  </div>
+<% } else { %>
+  <div class="text-center py-5">
+    <h4>No listings found</h4>
+    <p>Try adjusting your search or filters</p>
+    <a href="/listings" class="btn btn-outline-dark">Browse all listings</a>
+  </div>
+<% } %>
+
+<script>
+  // Tax toggle functionality
+  const taxSwitch = document.getElementById("flexSwitchCheckDefault");
+  taxSwitch.addEventListener("change", () => {
+    document.querySelectorAll(".tax-info").forEach(info => {
+      info.style.display = taxSwitch.checked ? "inline" : "none";
+    });
+  });
+
+  // Filter functionality (you'll need to implement this)
+  document.querySelectorAll(".filter").forEach(filter => {
+    filter.addEventListener("click", function() {
+      // Implement filter logic here
+      console.log("Filter by:", this.querySelector("p").textContent);
+    });
+  });
+</script>

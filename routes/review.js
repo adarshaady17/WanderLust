@@ -15,4 +15,4 @@ const reviewController=require("../controllers/reviews.js");
   router.delete("/:reviewId",isLoggedIn,isReviewAuther,wrapAsync(reviewController.deleteReview)
 );
 
-module.exports=router;
+module.exports=router;  
